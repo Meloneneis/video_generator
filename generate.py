@@ -57,7 +57,15 @@ def request(method, url, key, body=None):
     try:
         with urllib.request.urlopen(req, timeout=300) as r:
             raw = r.read()
-            return json.loads(raw) if raw[:1] in (b"{", b"[") else raw
+            ctype = r.headers.get("Content-Type", "")
+            if "json" in ctype or raw.lstrip()[:1] in (b"{", b"["):
+                try:
+                    return json.loads(raw)
+                except ValueError:
+                    pass
+            if method == "POST":
+                sys.exit(f"unexpected non-JSON response ({ctype}): {raw[:500]!r}")
+            return raw
     except urllib.error.HTTPError as e:
         sys.exit(f"HTTP {e.code}: {e.read().decode(errors='replace')}")
 
