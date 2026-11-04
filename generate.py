@@ -90,13 +90,15 @@ def main():
     body = {
         "model": a.model,
         "prompt": a.prompt,
-        "resolution": a.resolution,
-        "aspect_ratio": a.aspect,
         "generate_audio": False,
         "input_references": [ref(a.video, "video"), ref(a.person, "image")],
     }
     if duration:
         body["duration"] = duration
+    if a.resolution:
+        body["resolution"] = a.resolution
+    if a.aspect:
+        body["aspect_ratio"] = a.aspect
 
     job = request("POST", f"{API}/videos", key, body)
     print("submitted:", json.dumps(job))
