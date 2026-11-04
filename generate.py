@@ -78,7 +78,7 @@ def ref(path_or_url, kind):
 def main():
     p = argparse.ArgumentParser()
     p.add_argument("--video", required=True, help="driving dance video (path or https URL)")
-    p.add_argument("--person", required=True, help="photo of the person (path or https URL)")
+    p.add_argument("--person", required=True, help='photo of the person (path or https URL), or "none" to send only the video')
     p.add_argument("--out", default="out.mp4")
     p.add_argument("--model", default="bytedance/seedance-2.5")
     p.add_argument("--duration", type=int, default=None)
@@ -102,7 +102,7 @@ def main():
         "model": a.model,
         "prompt": a.prompt,
         "generate_audio": False,
-        "input_references": [ref(a.video, "video"), ref(a.person, "image")],
+        "input_references": [ref(a.video, "video")] + ([] if a.person == "none" else [ref(a.person, "image")]),
     }
     if a.no_refs:
         del body["input_references"]
