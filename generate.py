@@ -77,6 +77,9 @@ def main():
     p.add_argument("--resolution", default="480p")
     p.add_argument("--aspect", default="16:9")
     p.add_argument("--prompt", default=DEFAULT_PROMPT)
+    p.add_argument("--provider-options", default=None,
+                   help='JSON passthrough, e.g. {"atlas-cloud": {"video": "https://..."}}')
+    p.add_argument("--no-refs", action="store_true", help="don't send input_references (use passthrough instead)")
     p.add_argument("--keep-audio", action="store_true", help="mux the original video's audio into the result")
     a = p.parse_args()
     key = load_key()
@@ -93,6 +96,10 @@ def main():
         "generate_audio": False,
         "input_references": [ref(a.video, "video"), ref(a.person, "image")],
     }
+    if a.no_refs:
+        del body["input_references"]
+    if a.provider_options:
+        body["provider"] = {"options": json.loads(a.provider_options)}
     if duration:
         body["duration"] = duration
     if a.resolution:
